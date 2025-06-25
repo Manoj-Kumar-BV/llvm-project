@@ -115,9 +115,8 @@ python app_terminal.py --repo Manoj-Kumar-BV/llvm-project --pr 123 --export revi
 - **OpenMP Spec not found:** Make sure the PDF is named and located as specified.
 
 ---
+## Outputs 
+![image](https://github.com/user-attachments/assets/8e3d054c-e3c5-462f-a2cf-5d37289994a8)
 
-## License
+![image](https://github.com/user-attachments/assets/0aaa01b8-a52f-42ae-9b67-f6c79e8f97f2)
 
-MIT License. See `LICENSE`.
-
----
