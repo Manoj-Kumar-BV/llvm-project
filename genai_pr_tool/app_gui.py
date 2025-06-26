@@ -20,8 +20,6 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# ========== OPENMP SPECIFICATION LOADER & SEARCHER ==========
-
 # ========== Code Extensions ==========
 # Define which file extensions are considered code files (for optional filtering)
 CODE_EXTENSIONS = (
@@ -30,6 +28,8 @@ CODE_EXTENSIONS = (
 )
 # You can add more extensions as needed, or remove the ones you don't want to summarize
 # If you want to summarize only code files, you can filter by these extensions in the summarization loop.
+
+# ========== OPENMP SPECIFICATION LOADER & SEARCHER ==========
 # ========== OpenMP Specification Class ==========
 
 class OpenMPSpec:
@@ -125,20 +125,41 @@ def extract_keywords(text):
 
 def summarize_patch_with_llm(filename, patch, section_text):
     """
-    Calls the LLM to generate a summary for a file patch, referencing the OpenMP spec section.
+    Calls the LLM to generate a structured PR description for OpenMP-related changes.
     """
     prompt = f"""
-You are reviewing a GitHub pull request for an OpenMP-related project.
+You are an assistant for the LLVM Clang project, helping reviewers understand OpenMP-related pull requests.
 
-File Changed: {filename}
+The following file was modified:
+**{filename}**
 
-Patch:
+### Diff Summary:
 {patch}
 
-Relevant OpenMP Spec Section:
+### OpenMP Specification Context (retrieved based on clause/section relevance):
 {section_text}
 
-Please generate a structured, reviewer-friendly summary for this change, referencing the specification where appropriate.
+Based on the above, generate a concise and structured PR description that includes:
+
+1. **What the patch introduces, modifies, or removes** — including changes to functions, flags, behavior, or data structures.
+2. **How this aligns with or implements specific OpenMP clauses**, referencing section numbers or concepts where relevant.
+3. **Why the change is necessary** — e.g., spec compliance, bug fix, performance improvement, or new feature support.
+4. **Any caveats or reviewer points to note**, like edge cases or downstream implications.
+
+### Output Format:
+**Title:** A short, clear summary of the purpose of the patch (1 line max).
+
+**Summary of Changes**
+- ...
+
+**OpenMP Specification Alignment**
+- ...
+
+**Motivation**
+- ...
+
+**Reviewer Notes**
+- ...
 """
     response = client.chat.completions.create(
         model=MODEL_NAME,
@@ -147,6 +168,7 @@ Please generate a structured, reviewer-friendly summary for this change, referen
         max_tokens=800,
     )
     return response.choices[0].message.content
+
 
 def insert_with_bold(text_widget, content):
     """
